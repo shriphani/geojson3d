@@ -23,5 +23,11 @@
   "bugs": {
     "url": "https://github.com/shriphani/geojson3d/issues"
   },
-  "homepage": "https://github.com/shriphani/geojson3d#readme"
+  "homepage": "https://github.com/shriphani/geojson3d#readme",
+  "dependencies": {
+    "d3": "^4.6.0",
+    "three": "^0.84.0",
+    "topojson": "^2.2.0",
+    "turf": "^3.0.14"
+  }
 }
