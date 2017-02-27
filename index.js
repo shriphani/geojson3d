@@ -209,8 +209,6 @@ var initScene = function (container, json_location, width, height) {
         container.style.height = defaultHeight + "px";
     }
 
-    console.log(container.clientHeight);
-
     camera = new THREE.PerspectiveCamera( 70, container.clientWidth / container.clientHeight, 0.1, 10000);
     camera.position.z = Math.min(container.clientWidth, container.clientHeight);
     controls = new THREE.TrackballControls(camera, container);
@@ -262,6 +260,7 @@ var initScene = function (container, json_location, width, height) {
     renderer.render(scene, camera);
 
     draw(json_location, container);
+    animate();
 }
 
 exports.initScene = initScene;
