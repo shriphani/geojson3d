@@ -4,6 +4,9 @@ var topojson = require('topojson');
 var geo = require('./geo');
 THREE.TrackballControls = require('three-trackballcontrols');
 
+var defaultWidth = 640;
+var defaultHeight = 480;
+
 var materials = {
         phong: function(color) {
           return new THREE.MeshPhongMaterial({
@@ -47,7 +50,12 @@ var materials = {
 //         };
 var material = 'phong';
 
-function onWindowResize() {
+var container;
+      var camera, controls, scene, renderer;
+      var light, spotLight, ambientLight;
+      var cross;
+
+function onWindowResize(container) {
     camera.aspect = container.clientWidth / container.clientHeight;
     camera.updateProjectionMatrix();
     renderer.setSize(container.clientWidth, container.clientHeight);
@@ -138,8 +146,8 @@ function addFeature(feature, projection, functions) {
     return group;
 }
 
-function draw(json_url) {
-    //clearGroups(); TODO - fix this
+function draw(json_url, container) {
+    clearGroups(); //TODO - fix this
 
     var width = container.clientWidth;
     var height = container.clientHeight;
@@ -156,7 +164,7 @@ function draw(json_url) {
             },
 
             height: function(d) {
-                return Math.random() * 16777216
+                return Math.random()
             }
         };
 
@@ -191,7 +199,17 @@ function draw(json_url) {
 }
 
 
-var initScene = function (container, json_location) {
+var initScene = function (container, json_location, width, height) {
+
+    if (width == undefined) {
+        container.style.width = defaultWidth + "px";
+    }
+
+    if (height == undefined) {
+        container.style.height = defaultHeight + "px";
+    }
+
+    console.log(container.clientHeight);
 
     camera = new THREE.PerspectiveCamera( 70, container.clientWidth / container.clientHeight, 0.1, 10000);
     camera.position.z = Math.min(container.clientWidth, container.clientHeight);
@@ -240,10 +258,10 @@ var initScene = function (container, json_location) {
     renderer.shadowMapHeight = 1024;
 
     window.addEventListener('resize', onWindowResize, false);
-    onWindowResize();
+    onWindowResize(container);
     renderer.render(scene, camera);
 
-    draw(json_location);
+    draw(json_location, container);
 }
 
 exports.initScene = initScene;
