@@ -179,20 +179,20 @@ function draw(json_url, container) {
 
         } else if (json.type === 'Topology') {
 
-        var geojson = topojson.merge(json, json.objects[Object.keys(json.objects)[0]].geometries);
-        var projection = geo.getProjection(geojson, width, height);
+            var geojson = topojson.feature(json, json.objects[Object.keys(json.objects)[0]]);
+            var projection = geo.getProjection(geojson, width, height);
 
-        Object.keys(json.objects).forEach(function(key) {
-            json.objects[key].geometries.forEach(function(object) {
-            var feature = topojson.feature(json, object);
-            var group = addFeature(feature, projection, functions);
-            object._group = group;
+            Object.keys(json.objects).forEach(function(key) {
+                json.objects[key].geometries.forEach(function(object) {
+                var feature = topojson.feature(json, object);
+                var group = addFeature(feature, projection, functions);
+                object._group = group;
+                });
             });
-        });
 
-        } else {
-            console.log('This tutorial only renders TopoJSON and GeoJSON FeatureCollections')
-        }
+            } else {
+                console.log('This tutorial only renders TopoJSON and GeoJSON FeatureCollections')
+            }
 
         render();
     });
