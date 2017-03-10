@@ -66,6 +66,8 @@ function ringToPoints(ring, projection) {
 function createPolygonShape(polygon, projection) {
   var outerRing = polygon[0];
   var points = ringToPoints(outerRing, projection);
+  //points = points.slice(0, 1000) + [points[0]]
+  //console.log(points);
   var polygonShape = new THREE.Shape(points);
 
   polygon.slice(1).forEach(function(hole) {
