@@ -3,6 +3,7 @@ var d3 = require('d3');
 var topojson = require('topojson');
 var geo = require('./geo');
 THREE.TrackballControls = require('three-trackballcontrols');
+var earcut = require('earcut');
 
 var defaultWidth = 640;
 var defaultHeight = 480;
@@ -10,7 +11,7 @@ var defaultHeight = 480;
 var materials = {
         phong: function(color) {
           return new THREE.MeshPhongMaterial({
-            color: color, side: THREE.DoubleSide
+            color: color, side: THREE.DoubleSide, depthWrite: false
             //	phong : new THREE.MeshPhongMaterial({ color: 0xffffff, specular: 0x000000, shininess: 60, shading: THREE.SmoothShading, transparent:true  }),
           });
         },
@@ -48,7 +49,7 @@ var materials = {
 //           amount: amount,
 //           bevelEnabled: false
 //         };
-var material = 'phong';
+var material = 'meshLambert';
 
 var container;
       var camera, controls, scene, renderer;
@@ -88,6 +89,49 @@ function clearGroups(json) {
     }
     render();
 }
+
+THREE.ShapeUtils.triangulateShape = function ( contour, holes ) {
+    var i, il, dim = 2, array;
+            var holeIndices = [];
+            var points = [];
+
+            addPoints( contour );
+
+            for ( i = 0, il = holes.length; i < il; i ++ ) {
+
+                holeIndices.push( points.length / dim );
+
+                addPoints( holes[ i ] );
+
+            }
+
+            array = earcut( points, holeIndices, dim );
+
+            var result = [];
+
+            for ( i = 0, il = array.length; i < il; i += 3 ) {
+
+                result.push( array.slice( i, i + 3 ) );
+
+            }
+
+            return result;
+
+            function addPoints( a ) {
+
+                var i, il = a.length;
+
+                for ( i = 0; i < il; i ++ ) {
+
+                    points.push( a[ i ].x, a[ i ].y );
+
+                }
+
+            }
+
+        }
+
+
 
 function addShape(group, shape, extrudeSettings, material, color, x, y, z, rx, ry, rz, s) {
 
@@ -164,7 +208,7 @@ function draw(json_url, container) {
             },
 
             height: function(d) {
-                return Math.random()
+                return 1.0
             }
         };
 
@@ -182,9 +226,11 @@ function draw(json_url, container) {
             var geojson = topojson.feature(json, json.objects[Object.keys(json.objects)[0]]);
             var projection = geo.getProjection(geojson, width, height);
 
+
             Object.keys(json.objects).forEach(function(key) {
                 json.objects[key].geometries.forEach(function(object) {
                 var feature = topojson.feature(json, object);
+                console.log(feature);
                 var group = addFeature(feature, projection, functions);
                 object._group = group;
                 });
