@@ -301,7 +301,7 @@ var initScene = function (container, json_location, width, height) {
     renderer.shadowMapWidth = 1024;
     renderer.shadowMapHeight = 1024;
 
-    window.addEventListener('resize', onWindowResize, false);
+    window.addEventListener('resize',function(ev){onWindowResize(container)}, false);
     onWindowResize(container);
     renderer.render(scene, camera);
 
