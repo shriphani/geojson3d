@@ -10,10 +10,15 @@ var defaultHeight = 480;
 
 var materials = {
         phong: function(color) {
-          return new THREE.MeshPhongMaterial({
-            color: color, side: THREE.DoubleSide, depthWrite: false
-            //	phong : new THREE.MeshPhongMaterial({ color: 0xffffff, specular: 0x000000, shininess: 60, shading: THREE.SmoothShading, transparent:true  }),
-          });
+            return new THREE.MeshPhongMaterial(
+                { 
+                    color: color,
+                    specular: 0x000000,
+                    shininess: 60,
+                    shading: THREE.SmoothShading,
+                    transparent:true  
+                }
+            )
         },
         meshLambert: function(color) {
           return new THREE.MeshLambertMaterial({
@@ -49,7 +54,7 @@ var materials = {
 //           amount: amount,
 //           bevelEnabled: false
 //         };
-var material = 'meshLambert';
+var material = 'phong';
 
 var container;
       var camera, controls, scene, renderer;
@@ -81,6 +86,7 @@ function clearGroups(json) {
         });
         } else if (json.type === 'Topology') {
         Object.keys(json.objects).forEach(function(key) {
+            console.log(json.objects[key]);
             json.objects[key].geometries.forEach(function(object) {
             scene.remove(object._group);
             });
@@ -104,8 +110,13 @@ THREE.ShapeUtils.triangulateShape = function ( contour, holes ) {
                 addPoints( holes[ i ] );
 
             }
-
-            array = earcut( points, holeIndices, dim );
+            try
+            {
+                array = earcut( points, holeIndices, dim );
+            }
+            catch (err) {
+                console.warn(err)
+            }
 
             var result = [];
 
@@ -134,19 +145,22 @@ THREE.ShapeUtils.triangulateShape = function ( contour, holes ) {
 
 
 function addShape(group, shape, extrudeSettings, material, color, x, y, z, rx, ry, rz, s) {
+        try{
+            var geometry = new THREE.ExtrudeGeometry(shape, extrudeSettings);
 
-        var geometry = new THREE.ExtrudeGeometry(shape, extrudeSettings);
+            var mesh = new THREE.Mesh(geometry, materials[material](color));
 
-        var mesh = new THREE.Mesh(geometry, materials[material](color));
+            // Add shadows
+            mesh.castShadow = true;
+            mesh.receiveShadow = true;
 
-        // Add shadows
-        mesh.castShadow = true;
-        mesh.receiveShadow = true;
-
-        mesh.position.set(x, y, z);
-        mesh.rotation.set(rx, ry, rz);
-        mesh.scale.set(s, s, s);
-        group.add(mesh);
+            mesh.position.set(x, y, z);
+            mesh.rotation.set(rx, ry, rz);
+            mesh.scale.set(s, s, s);
+            group.add(mesh);
+        } catch (err) {
+            console.warn(err);
+        }
       }
 
 function addFeature(feature, projection, functions) {
