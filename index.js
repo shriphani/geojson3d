@@ -358,5 +358,4 @@ var plot = function(container, json_location, width, height) {
     animate(sceneObj);
 }
 
-exports.initScene = initScene;
 exports.plot = plot;
