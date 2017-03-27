@@ -9,46 +9,46 @@ var defaultWidth = 640;
 var defaultHeight = 480;
 
 var materials = {
-        phong: function(color) {
-            return new THREE.MeshPhongMaterial(
-                { 
-                    color: color,
-                    specular: 0x000000,
-                    shininess: 60,
-                    shading: THREE.SmoothShading,
-                    transparent:true  
-                }
-            )
-        },
-        meshLambert: function(color) {
-          return new THREE.MeshLambertMaterial({
+    phong: function(color) {
+        return new THREE.MeshPhongMaterial(
+            { 
+                color: color,
+                specular: 0x000000,
+                shininess: 60,
+                shading: THREE.SmoothShading,
+                transparent:true  
+            }
+        )
+    },
+    meshLambert: function(color) {
+        return new THREE.MeshLambertMaterial({
+        color: color,
+        specular: 0x009900,
+        shininess: 30,
+        shading: THREE.SmoothShading,
+        transparent:true
+        });
+    },
+    meshWireFrame: function(color) {
+        return new THREE.MeshBasicMaterial({
             color: color,
-            specular: 0x009900,
-            shininess: 30,
-            shading: THREE.SmoothShading,
-            transparent:true
-          });
-        },
-        meshWireFrame: function(color) {
-          return new THREE.MeshBasicMaterial({
-             color: color,
-            specular: 0x009900,
-            shininess: 30,
-            shading: THREE.SmoothShading,
-            wireframe:true,
-            transparent:true
-          });
-        },
-        meshBasic: function(color) {
-          return new THREE.MeshBasicMaterial({
-            color: color,
-            specular: 0x009900,
-            shininess: 30,
-            shading: THREE.SmoothShading,
-            transparent: true
-          });
-        }
-      };
+        specular: 0x009900,
+        shininess: 30,
+        shading: THREE.SmoothShading,
+        wireframe:true,
+        transparent:true
+        });
+    },
+    meshBasic: function(color) {
+        return new THREE.MeshBasicMaterial({
+        color: color,
+        specular: 0x009900,
+        shininess: 30,
+        shading: THREE.SmoothShading,
+        transparent: true
+        });
+    }
+};
 
 // var extrudeSettings = {
 //           amount: amount,
@@ -56,29 +56,21 @@ var materials = {
 //         };
 var material = 'phong';
 
-var container;
-      var camera, controls, scene, renderer;
-      var light, spotLight, ambientLight;
-      var cross;
-
-function onWindowResize(container) {
-    camera.aspect = container.clientWidth / container.clientHeight;
-    camera.updateProjectionMatrix();
-    renderer.setSize(container.clientWidth, container.clientHeight);
-    controls.handleResize();
-    render();
+function onWindowResize(container, sceneObj) {
+    sceneObj.camera.aspect = container.clientWidth / container.clientHeight;
+    sceneObj.camera.updateProjectionMatrix();
+    sceneObj.renderer.setSize(container.clientWidth, container.clientHeight);
+    sceneObj.controls.handleResize();
+    sceneObj.renderer.render(sceneObj.scene, sceneObj.camera);
 }
 
-function animate() {
-    requestAnimationFrame(animate);
-    controls.update();
+function animate(sceneObj) {
+    requestAnimationFrame(
+        () => animate(sceneObj));
+    sceneObj.controls.update();
 }
 
-function render() {
-    renderer.render(scene, camera);
-}
-
-function clearGroups(json) {
+function clearGroups(json, sceneObj) {
     if (json) {
         if (json.type === 'FeatureCollection') {
         json.features.forEach(function(feature) {
@@ -88,12 +80,15 @@ function clearGroups(json) {
         Object.keys(json.objects).forEach(function(key) {
             console.log(json.objects[key]);
             json.objects[key].geometries.forEach(function(object) {
-            scene.remove(object._group);
+            sceneObj.scene.remove(object._group);
             });
         });
         }
     }
-    render();
+    sceneObj.renderer.render(
+        sceneObj.scene,
+        sceneObj.camera
+    );
 }
 
 THREE.ShapeUtils.triangulateShape = function ( contour, holes ) {
@@ -163,9 +158,9 @@ function addShape(group, shape, extrudeSettings, material, color, x, y, z, rx, r
         }
       }
 
-function addFeature(feature, projection, functions) {
+function addFeature(sceneObj, feature, projection, functions) {
     var group = new THREE.Group();
-    scene.add(group);
+    sceneObj.scene.add(group);
 
     var color;
     var amount;
@@ -204,13 +199,13 @@ function addFeature(feature, projection, functions) {
     return group;
 }
 
-function draw(json_url, container) {
-    clearGroups(); //TODO - fix this
+function draw(json_url, container, sceneObj) {
 
     var width = container.clientWidth;
     var height = container.clientHeight;
 
     d3.json(json_url, function(data) {
+        clearGroups(data, sceneObj); //TODO - fix this
 
         json = data;
 
@@ -231,7 +226,7 @@ function draw(json_url, container) {
         var projection = geo.getProjection(json, width, height);
 
         json.features.forEach(function(feature) {
-            var group = addFeature(feature, projection, functions);
+            var group = addFeature(sceneObj, feature, projection, functions);
             feature._group = group;
         });
 
@@ -245,7 +240,7 @@ function draw(json_url, container) {
                 json.objects[key].geometries.forEach(function(object) {
                 var feature = topojson.feature(json, object);
                 console.log(feature);
-                var group = addFeature(feature, projection, functions);
+                var group = addFeature(sceneObj, feature, projection, functions);
                 object._group = group;
                 });
             });
@@ -254,12 +249,16 @@ function draw(json_url, container) {
                 console.log('This tutorial only renders TopoJSON and GeoJSON FeatureCollections')
             }
 
-        render();
+        sceneObj.renderer.render(sceneObj.scene, sceneObj.camera);
     });
 }
 
 
 var initScene = function (container, json_location, width, height) {
+
+    var camera, controls, scene, renderer;
+    var light, spotLight, ambientLight;
+    var cross;
 
     if (width == undefined) {
         container.style.width = defaultWidth + "px";
@@ -280,7 +279,6 @@ var initScene = function (container, json_location, width, height) {
     controls.staticMoving = true;
     controls.dynamicDampingFactor = 0.3;
     controls.keys = [65, 83, 68];
-    controls.addEventListener('change', render);
 
     // World
     scene = new THREE.Scene();
@@ -315,12 +313,50 @@ var initScene = function (container, json_location, width, height) {
     renderer.shadowMapWidth = 1024;
     renderer.shadowMapHeight = 1024;
 
-    window.addEventListener('resize',function(ev){onWindowResize(container)}, false);
-    onWindowResize(container);
+    sceneObj = {
+        camera: camera,
+        controls: controls,
+        scene: scene,
+        renderer: renderer,
+        light: light,
+        spotLight: spotLight,
+        ambientLight: ambientLight,
+        cross: cross
+    };
+
+    controls.addEventListener(
+        'change',
+        function () {
+            sceneObj.renderer.render(sceneObj.scene, sceneObj.camera);
+        }
+    );
+
+
+    window.addEventListener(
+        'resize',
+        function(ev) {
+            onWindowResize(container, sceneObj);
+        },
+        false
+    );
+
+    onWindowResize(container, sceneObj);
     renderer.render(scene, camera);
 
-    draw(json_location, container);
-    animate();
+    return sceneObj
+}
+
+var plot = function(container, json_location, width, height) {
+    sceneObj = initScene(
+        container,
+        json_location,
+        width,
+        height
+    );
+
+    draw(json_location, container, sceneObj);
+    animate(sceneObj);
 }
 
 exports.initScene = initScene;
+exports.plot = plot;
