@@ -71,7 +71,7 @@ function clearGroups(json, sceneObj) {
         if (json.type === 'FeatureCollection') {
             json.features.forEach(
                 function(feature) {
-                    scene.remove(feature._group);
+                    sceneObj.scene.remove(feature._group);
                 }
             );
         } else if (json.type === 'Topology') {
@@ -225,30 +225,21 @@ function draw(json_url, container, sceneObj) {
     d3.json(json_url, function(data) {
         clearGroups(data, sceneObj);
 
-        json = data;
-
-        console.log(json);
-
         var functions = {
             color: function(d) {
-                return Math.random() * 16777216
+                return Math.random() * 16777216;
             },
 
             height: function(d) {
-                return 1.0
+                return Math.random() * 20;
             }
         };
 
-        if (json.type === 'FeatureCollection') {
+        if (data.type === 'FeatureCollection') {
 
-        var projection = geo.getProjection(json, width, height);
+            drawFeatureCollection(data, width, height, functions, sceneObj);
 
-        json.features.forEach(function(feature) {
-            var group = addFeature(sceneObj, feature, projection, functions);
-            feature._group = group;
-        });
-
-        } else if (json.type === 'Topology') {
+        } else if (data.type === 'Topology') {
 
             var geojson = topojson.feature(json, json.objects[Object.keys(json.objects)[0]]);
             var projection = geo.getProjection(geojson, width, height);
@@ -271,6 +262,13 @@ function draw(json_url, container, sceneObj) {
     });
 }
 
+function drawFeatureCollection(data, width, height, functions, sceneObj) {
+    var projection = geo.getProjection(data, width, height);
+    data.features.forEach(function(feature) {
+        var group = addFeature(sceneObj, feature, projection, functions);
+        feature._group = group;
+    });
+}
 
 var initScene = function (container, json_location, width, height) {
 
