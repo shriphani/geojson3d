@@ -50,10 +50,6 @@ var materials = {
     }
 };
 
-// var extrudeSettings = {
-//           amount: amount,
-//           bevelEnabled: false
-//         };
 var material = 'phong';
 
 function onWindowResize(container, sceneObj) {
@@ -73,16 +69,22 @@ function animate(sceneObj) {
 function clearGroups(json, sceneObj) {
     if (json) {
         if (json.type === 'FeatureCollection') {
-        json.features.forEach(function(feature) {
-            scene.remove(feature._group);
-        });
+            json.features.forEach(
+                function(feature) {
+                    scene.remove(feature._group);
+                }
+            );
         } else if (json.type === 'Topology') {
-        Object.keys(json.objects).forEach(function(key) {
-            console.log(json.objects[key]);
-            json.objects[key].geometries.forEach(function(object) {
-            sceneObj.scene.remove(object._group);
-            });
-        });
+            Object.keys(json.objects).forEach(
+                function(key) {
+                    console.log(json.objects[key]);
+                    json.objects[key].geometries.forEach(
+                        function(object) {
+                            sceneObj.scene.remove(object._group);
+                        }
+                    );
+                }
+            );
         }
     }
     sceneObj.renderer.render(
@@ -91,73 +93,89 @@ function clearGroups(json, sceneObj) {
     );
 }
 
+/**
+ * Use triangulation from earcut. The default triangulation
+ * causes holes to appear in the drawn maps.
+ */
 THREE.ShapeUtils.triangulateShape = function ( contour, holes ) {
     var i, il, dim = 2, array;
-            var holeIndices = [];
-            var points = [];
+    var holeIndices = [];
+    var points = [];
 
-            addPoints( contour );
+    addPoints( contour );
 
-            for ( i = 0, il = holes.length; i < il; i ++ ) {
+    for ( i = 0, il = holes.length; i < il; i ++ ) {
+        holeIndices.push( points.length / dim );
+        addPoints( holes[ i ] );
+    }
+    
+    try {
+        array = earcut(points, holeIndices, dim);
+    } catch (err) {
+        console.warn(err)
+    }
 
-                holeIndices.push( points.length / dim );
+    var result = [];
 
-                addPoints( holes[ i ] );
+    for ( i = 0, il = array.length; i < il; i += 3 ) {
+        result.push(
+            array.slice(i, i + 3));
+    }
 
-            }
-            try
-            {
-                array = earcut( points, holeIndices, dim );
-            }
-            catch (err) {
-                console.warn(err)
-            }
+    return result;
 
-            var result = [];
-
-            for ( i = 0, il = array.length; i < il; i += 3 ) {
-
-                result.push( array.slice( i, i + 3 ) );
-
-            }
-
-            return result;
-
-            function addPoints( a ) {
-
-                var i, il = a.length;
-
-                for ( i = 0; i < il; i ++ ) {
-
-                    points.push( a[ i ].x, a[ i ].y );
-
-                }
-
-            }
-
+    function addPoints( a ) {
+        var i, il = a.length;
+        for ( i = 0; i < il; i ++ ) {
+            points.push( a[ i ].x, a[ i ].y );
         }
 
+    }
 
+}
 
+/**
+ * Add a shape to the scene.
+ * @param {*} group 
+ * @param {*} shape 
+ * @param {*} extrudeSettings 
+ * @param {*} material 
+ * @param {*} color 
+ * @param {*} x 
+ * @param {*} y 
+ * @param {*} z 
+ * @param {*} rx 
+ * @param {*} ry 
+ * @param {*} rz 
+ * @param {*} s 
+ */
 function addShape(group, shape, extrudeSettings, material, color, x, y, z, rx, ry, rz, s) {
-        try{
-            var geometry = new THREE.ExtrudeGeometry(shape, extrudeSettings);
+    try{
+        var geometry = new THREE.ExtrudeGeometry(shape, extrudeSettings);
 
-            var mesh = new THREE.Mesh(geometry, materials[material](color));
+        var mesh = new THREE.Mesh(geometry, materials[material](color));
 
-            // Add shadows
-            mesh.castShadow = true;
-            mesh.receiveShadow = true;
+        // Add shadows
+        mesh.castShadow = true;
+        mesh.receiveShadow = true;
 
-            mesh.position.set(x, y, z);
-            mesh.rotation.set(rx, ry, rz);
-            mesh.scale.set(s, s, s);
-            group.add(mesh);
-        } catch (err) {
-            console.warn(err);
-        }
-      }
+        mesh.position.set(x, y, z);
+        mesh.rotation.set(rx, ry, rz);
+        mesh.scale.set(s, s, s);
+        group.add(mesh);
+    } catch (err) {
+        console.warn(err);
+    }
+}
 
+/**
+ * A feature is a unit of a FeatureCollection. Converts
+ * a feature to the appropriate three.js object and adds it to the scene.
+ * @param {*} sceneObj 
+ * @param {*} feature 
+ * @param {*} projection 
+ * @param {*} functions 
+ */
 function addFeature(sceneObj, feature, projection, functions) {
     var group = new THREE.Group();
     sceneObj.scene.add(group);
@@ -205,7 +223,7 @@ function draw(json_url, container, sceneObj) {
     var height = container.clientHeight;
 
     d3.json(json_url, function(data) {
-        clearGroups(data, sceneObj); //TODO - fix this
+        clearGroups(data, sceneObj);
 
         json = data;
 
@@ -313,7 +331,7 @@ var initScene = function (container, json_location, width, height) {
     renderer.shadowMapWidth = 1024;
     renderer.shadowMapHeight = 1024;
 
-    sceneObj = {
+    var sceneObj = {
         camera: camera,
         controls: controls,
         scene: scene,
@@ -347,7 +365,7 @@ var initScene = function (container, json_location, width, height) {
 }
 
 var plot = function(container, json_location, width, height) {
-    sceneObj = initScene(
+    var sceneObj = initScene(
         container,
         json_location,
         width,
