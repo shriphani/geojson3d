@@ -241,16 +241,15 @@ function draw(json_url, container, sceneObj) {
 
         } else if (data.type === 'Topology') {
 
-            var geojson = topojson.feature(json, json.objects[Object.keys(json.objects)[0]]);
+            var geojson = topojson.feature(data, data.objects[Object.keys(data.objects)[0]]);
             var projection = geo.getProjection(geojson, width, height);
 
-
-            Object.keys(json.objects).forEach(function(key) {
-                json.objects[key].geometries.forEach(function(object) {
-                var feature = topojson.feature(json, object);
-                console.log(feature);
-                var group = addFeature(sceneObj, feature, projection, functions);
-                object._group = group;
+            Object.keys(data.objects).forEach(function(key) {
+                data.objects[key].geometries.forEach(function(object) {
+                    var feature = topojson.feature(data, object);
+                    console.log(feature);
+                    var group = addFeature(sceneObj, feature, projection, functions);
+                    object._group = group;
                 });
             });
 
