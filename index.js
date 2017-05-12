@@ -9,132 +9,148 @@ var defaultWidth = 640;
 var defaultHeight = 480;
 
 var materials = {
-        phong: function(color) {
-          return new THREE.MeshPhongMaterial({
-            color: color, side: THREE.DoubleSide, depthWrite: false
-            //	phong : new THREE.MeshPhongMaterial({ color: 0xffffff, specular: 0x000000, shininess: 60, shading: THREE.SmoothShading, transparent:true  }),
-          });
-        },
-        meshLambert: function(color) {
-          return new THREE.MeshLambertMaterial({
+    phong: function(color) {
+        return new THREE.MeshPhongMaterial(
+            { 
+                color: color,
+                specular: 0x000000,
+                shininess: 60,
+                shading: THREE.SmoothShading,
+                transparent:true  
+            }
+        )
+    },
+    meshLambert: function(color) {
+        return new THREE.MeshLambertMaterial({
+        color: color,
+        specular: 0x009900,
+        shininess: 30,
+        shading: THREE.SmoothShading,
+        transparent:true
+        });
+    },
+    meshWireFrame: function(color) {
+        return new THREE.MeshBasicMaterial({
             color: color,
-            specular: 0x009900,
-            shininess: 30,
-            shading: THREE.SmoothShading,
-            transparent:true
-          });
-        },
-        meshWireFrame: function(color) {
-          return new THREE.MeshBasicMaterial({
-             color: color,
-            specular: 0x009900,
-            shininess: 30,
-            shading: THREE.SmoothShading,
-            wireframe:true,
-            transparent:true
-          });
-        },
-        meshBasic: function(color) {
-          return new THREE.MeshBasicMaterial({
-            color: color,
-            specular: 0x009900,
-            shininess: 30,
-            shading: THREE.SmoothShading,
-            transparent: true
-          });
-        }
-      };
+        specular: 0x009900,
+        shininess: 30,
+        shading: THREE.SmoothShading,
+        wireframe:true,
+        transparent:true
+        });
+    },
+    meshBasic: function(color) {
+        return new THREE.MeshBasicMaterial({
+        color: color,
+        specular: 0x009900,
+        shininess: 30,
+        shading: THREE.SmoothShading,
+        transparent: true
+        });
+    }
+};
 
-// var extrudeSettings = {
-//           amount: amount,
-//           bevelEnabled: false
-//         };
-var material = 'meshLambert';
+var material = 'phong';
 
-var container;
-      var camera, controls, scene, renderer;
-      var light, spotLight, ambientLight;
-      var cross;
-
-function onWindowResize(container) {
-    camera.aspect = container.clientWidth / container.clientHeight;
-    camera.updateProjectionMatrix();
-    renderer.setSize(container.clientWidth, container.clientHeight);
-    controls.handleResize();
-    render();
+function onWindowResize(container, sceneObj) {
+    sceneObj.camera.aspect = container.clientWidth / container.clientHeight;
+    sceneObj.camera.updateProjectionMatrix();
+    sceneObj.renderer.setSize(container.clientWidth, container.clientHeight);
+    sceneObj.controls.handleResize();
+    sceneObj.renderer.render(sceneObj.scene, sceneObj.camera);
 }
 
-function animate() {
-    requestAnimationFrame(animate);
-    controls.update();
+function animate(sceneObj) {
+    requestAnimationFrame(
+        () => animate(sceneObj));
+    sceneObj.controls.update();
 }
 
-function render() {
-    renderer.render(scene, camera);
-}
-
-function clearGroups(json) {
+function clearGroups(json, sceneObj) {
     if (json) {
         if (json.type === 'FeatureCollection') {
-        json.features.forEach(function(feature) {
-            scene.remove(feature._group);
-        });
+            json.features.forEach(
+                function(feature) {
+                    sceneObj.scene.remove(feature._group);
+                }
+            );
         } else if (json.type === 'Topology') {
-        Object.keys(json.objects).forEach(function(key) {
-            json.objects[key].geometries.forEach(function(object) {
-            scene.remove(object._group);
-            });
-        });
+            Object.keys(json.objects).forEach(
+                function(key) {
+                    console.log(json.objects[key]);
+                    json.objects[key].geometries.forEach(
+                        function(object) {
+                            sceneObj.scene.remove(object._group);
+                        }
+                    );
+                }
+            );
         }
     }
-    render();
+    sceneObj.renderer.render(
+        sceneObj.scene,
+        sceneObj.camera
+    );
 }
 
+/**
+ * Use triangulation from earcut. The default triangulation
+ * causes holes to appear in the drawn maps.
+ */
 THREE.ShapeUtils.triangulateShape = function ( contour, holes ) {
     var i, il, dim = 2, array;
-            var holeIndices = [];
-            var points = [];
+    var holeIndices = [];
+    var points = [];
 
-            addPoints( contour );
+    addPoints( contour );
 
-            for ( i = 0, il = holes.length; i < il; i ++ ) {
+    for ( i = 0, il = holes.length; i < il; i ++ ) {
+        holeIndices.push( points.length / dim );
+        addPoints( holes[ i ] );
+    }
+    
+    try {
+        array = earcut(points, holeIndices, dim);
+    } catch (err) {
+        console.warn(err)
+    }
 
-                holeIndices.push( points.length / dim );
+    var result = [];
 
-                addPoints( holes[ i ] );
+    for ( i = 0, il = array.length; i < il; i += 3 ) {
+        result.push(
+            array.slice(i, i + 3));
+    }
 
-            }
+    return result;
 
-            array = earcut( points, holeIndices, dim );
-
-            var result = [];
-
-            for ( i = 0, il = array.length; i < il; i += 3 ) {
-
-                result.push( array.slice( i, i + 3 ) );
-
-            }
-
-            return result;
-
-            function addPoints( a ) {
-
-                var i, il = a.length;
-
-                for ( i = 0; i < il; i ++ ) {
-
-                    points.push( a[ i ].x, a[ i ].y );
-
-                }
-
-            }
-
+    function addPoints( a ) {
+        var i, il = a.length;
+        for ( i = 0; i < il; i ++ ) {
+            points.push( a[ i ].x, a[ i ].y );
         }
 
+    }
 
+}
 
+/**
+ * Add a shape to the scene.
+ * @param {*} group 
+ * @param {*} shape 
+ * @param {*} extrudeSettings 
+ * @param {*} material 
+ * @param {*} color 
+ * @param {*} x 
+ * @param {*} y 
+ * @param {*} z 
+ * @param {*} rx 
+ * @param {*} ry 
+ * @param {*} rz 
+ * @param {*} s 
+ */
 function addShape(group, shape, extrudeSettings, material, color, x, y, z, rx, ry, rz, s) {
-
+    try{
         var geometry = new THREE.ExtrudeGeometry(shape, extrudeSettings);
 
         var mesh = new THREE.Mesh(geometry, materials[material](color));
@@ -147,11 +163,22 @@ function addShape(group, shape, extrudeSettings, material, color, x, y, z, rx, r
         mesh.rotation.set(rx, ry, rz);
         mesh.scale.set(s, s, s);
         group.add(mesh);
-      }
+    } catch (err) {
+        console.warn(err);
+    }
+}
 
-function addFeature(feature, projection, functions) {
+/**
+ * A feature is a unit of a FeatureCollection. Converts
+ * a feature to the appropriate three.js object and adds it to the scene.
+ * @param {*} sceneObj 
+ * @param {*} feature 
+ * @param {*} projection 
+ * @param {*} functions 
+ */
+function addFeature(sceneObj, feature, projection, functions) {
     var group = new THREE.Group();
-    scene.add(group);
+    sceneObj.scene.add(group);
 
     var color;
     var amount;
@@ -190,49 +217,39 @@ function addFeature(feature, projection, functions) {
     return group;
 }
 
-function draw(json_url, container) {
-    clearGroups(); //TODO - fix this
+function draw(json_url, container, sceneObj) {
 
     var width = container.clientWidth;
     var height = container.clientHeight;
 
     d3.json(json_url, function(data) {
-
-        json = data;
-
-        console.log(json);
+        clearGroups(data, sceneObj);
 
         var functions = {
             color: function(d) {
-                return Math.random() * 16777216
+                return Math.random() * 16777216;
             },
 
             height: function(d) {
-                return 1.0
+                return Math.random() * 20;
             }
         };
 
-        if (json.type === 'FeatureCollection') {
+        if (data.type === 'FeatureCollection') {
 
-        var projection = geo.getProjection(json, width, height);
+            drawFeatureCollection(data, width, height, functions, sceneObj);
 
-        json.features.forEach(function(feature) {
-            var group = addFeature(feature, projection, functions);
-            feature._group = group;
-        });
+        } else if (data.type === 'Topology') {
 
-        } else if (json.type === 'Topology') {
-
-            var geojson = topojson.feature(json, json.objects[Object.keys(json.objects)[0]]);
+            var geojson = topojson.feature(data, data.objects[Object.keys(data.objects)[0]]);
             var projection = geo.getProjection(geojson, width, height);
 
-
-            Object.keys(json.objects).forEach(function(key) {
-                json.objects[key].geometries.forEach(function(object) {
-                var feature = topojson.feature(json, object);
-                console.log(feature);
-                var group = addFeature(feature, projection, functions);
-                object._group = group;
+            Object.keys(data.objects).forEach(function(key) {
+                data.objects[key].geometries.forEach(function(object) {
+                    var feature = topojson.feature(data, object);
+                    console.log(feature);
+                    var group = addFeature(sceneObj, feature, projection, functions);
+                    object._group = group;
                 });
             });
 
@@ -240,12 +257,23 @@ function draw(json_url, container) {
                 console.log('This tutorial only renders TopoJSON and GeoJSON FeatureCollections')
             }
 
-        render();
+        sceneObj.renderer.render(sceneObj.scene, sceneObj.camera);
     });
 }
 
+function drawFeatureCollection(data, width, height, functions, sceneObj) {
+    var projection = geo.getProjection(data, width, height);
+    data.features.forEach(function(feature) {
+        var group = addFeature(sceneObj, feature, projection, functions);
+        feature._group = group;
+    });
+}
 
 var initScene = function (container, json_location, width, height) {
+
+    var camera, controls, scene, renderer;
+    var light, spotLight, ambientLight;
+    var cross;
 
     if (width == undefined) {
         container.style.width = defaultWidth + "px";
@@ -266,7 +294,6 @@ var initScene = function (container, json_location, width, height) {
     controls.staticMoving = true;
     controls.dynamicDampingFactor = 0.3;
     controls.keys = [65, 83, 68];
-    controls.addEventListener('change', render);
 
     // World
     scene = new THREE.Scene();
@@ -301,12 +328,49 @@ var initScene = function (container, json_location, width, height) {
     renderer.shadowMapWidth = 1024;
     renderer.shadowMapHeight = 1024;
 
-    window.addEventListener('resize',function(ev){onWindowResize(container)}, false);
-    onWindowResize(container);
+    var sceneObj = {
+        camera: camera,
+        controls: controls,
+        scene: scene,
+        renderer: renderer,
+        light: light,
+        spotLight: spotLight,
+        ambientLight: ambientLight,
+        cross: cross
+    };
+
+    controls.addEventListener(
+        'change',
+        function () {
+            sceneObj.renderer.render(sceneObj.scene, sceneObj.camera);
+        }
+    );
+
+
+    window.addEventListener(
+        'resize',
+        function(ev) {
+            onWindowResize(container, sceneObj);
+        },
+        false
+    );
+
+    onWindowResize(container, sceneObj);
     renderer.render(scene, camera);
 
-    draw(json_location, container);
-    animate();
+    return sceneObj
 }
 
-exports.initScene = initScene;
+var plot = function(container, json_location, width, height) {
+    var sceneObj = initScene(
+        container,
+        json_location,
+        width,
+        height
+    );
+
+    draw(json_location, container, sceneObj);
+    animate(sceneObj);
+}
+
+exports.plot = plot;
