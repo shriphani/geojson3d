@@ -283,6 +283,13 @@ var initScene = function (container, json_location, width, height) {
         container.style.height = defaultHeight + "px";
     }
 
+    if (Number.isInteger(width)) {
+        width = string(width) + "px";
+    }
+    if (Number.isInteger(height)) {
+        height = string(height) + "px";
+    }
+
     camera = new THREE.PerspectiveCamera( 70, container.clientWidth / container.clientHeight, 0.1, 10000);
     camera.position.z = Math.min(container.clientWidth, container.clientHeight);
     controls = new THREE.TrackballControls(camera, container);
