@@ -259,6 +259,7 @@ function draw(json_url, container, sceneObj) {
                         object._group = group;
                     });
                 }
+
             });
 
             } else {
@@ -289,6 +290,13 @@ var initScene = function (container, json_location, width, height) {
 
     if (height == undefined) {
         container.style.height = defaultHeight + "px";
+    }
+
+    if (Number.isInteger(width)) {
+        width = string(width) + "px";
+    }
+    if (Number.isInteger(height)) {
+        height = string(height) + "px";
     }
 
     camera = new THREE.PerspectiveCamera( 70, container.clientWidth / container.clientHeight, 0.1, 10000);
