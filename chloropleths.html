@@ -10,14 +10,30 @@
   </head>
   <body>
       <div id="webgl"></div>
-      <script type="text/javascript">
+          <div id="waterloo_geo">
+          <script type="text/javascript">
           var container = document.getElementById("webgl");
           geojson3d.plot(document.getElementById("webgl"), '/testbench/waterloo_geo.json');
-      </script>
-      <script type="text/javascript">
+          </script>
+          </div>
+
+          <div id="central">
+          <script type="text/javascript">
           geojson3d.plot(document.getElementById("webgl"), '/testbench/central_map.json');
+          </script>
+          </div>
+
+          <div id="waterloo_topo">
+          <script type = "text/javascript">
           geojson3d.plot(document.getElementById("webgl"), '/testbench/waterloo_map.json');
+          </script>
+          </div>
+
+          <div id="us-states">
+          <script type = "text/javascript">
           geojson3d.plot(document.getElementById("webgl"), '/testbench/us-states.json');
-      </script>
+          </script>
+          </div>
+
   </body>
 </html>
