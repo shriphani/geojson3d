@@ -218,7 +218,7 @@ function addFeature(sceneObj, feature, projection, functions) {
     return group;
 }
 
-function draw(json_url, container, sceneObj) {
+function draw(json_url, container, sceneObj, functions, projectionStr) {
 
     var width = container.clientWidth;
     var height = container.clientHeight;
@@ -226,24 +226,26 @@ function draw(json_url, container, sceneObj) {
     d3.json(json_url, function(data) {
         clearGroups(data, sceneObj);
 
-        var functions = {
-            color: function(d) {
-                return Math.random() * 16777216;
-            },
+        if (functions == undefined) {
+            functions = {
+                color: function(d) {
+                    return Math.random() * 16777216;
+                },
 
-            height: function(d) {
-                return Math.random() * 20;
-            }
-        };
+                height: function(d) {
+                    return Math.random() * 20;
+                }
+            };
+        }
 
         if (data.type === 'FeatureCollection') {
 
-            drawFeatureCollection(data, width, height, functions, sceneObj);
+            drawFeatureCollection(data, width, height, functions, sceneObj, projectionStr);
 
         } else if (data.type === 'Topology') {
             console.log(data.objects);
             var geojson = topojson.feature(data, data.objects[Object.keys(data.objects)[0]]);
-            var projection = geo.getProjection(geojson, width, height);
+            var projection = geo.getProjection(geojson, width, height, projectionStr);
 
             
             Object.keys(data.objects).forEach(function(key) {
@@ -271,7 +273,7 @@ function draw(json_url, container, sceneObj) {
 }
 
 function drawFeatureCollection(data, width, height, functions, sceneObj) {
-    var projection = geo.getProjection(data, width, height);
+    var projection = geo.getProjection(data, width, height, projectionStr);
     data.features.forEach(function(feature) {
         var group = addFeature(sceneObj, feature, projection, functions);
         feature._group = group;
@@ -377,7 +379,7 @@ var initScene = function (container, json_location, width, height) {
     return sceneObj
 }
 
-var plot = function(container, json_location, width, height) {
+var plot = function(container, json_location, width, height, projection) {
     var sceneObj = initScene(
         container,
         json_location,
@@ -385,7 +387,7 @@ var plot = function(container, json_location, width, height) {
         height
     );
 
-    draw(json_location, container, sceneObj);
+    draw(json_location, container, sceneObj, projection);
     animate(sceneObj);
 }
 
