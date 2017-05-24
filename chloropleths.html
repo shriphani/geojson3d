@@ -1,6 +1,6 @@
 <html>
   <head>
-   <!-- <meta charset="utf-8">-->
+   <meta charset="utf-8">
     <title>
       Chloropleth maps
     </title>
@@ -9,29 +9,28 @@
     <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
   </head>
   <body>
-      <div id="webgl"></div>
+      
           <div id="waterloo_geo">
           <script type="text/javascript">
-          var container = document.getElementById("webgl");
-          geojson3d.plot(document.getElementById("webgl"), '/testbench/waterloo_geo.json');
+          geojson3d.plot(document.getElementById("waterloo_geo"), '/testbench/waterloo_geo.json');
           </script>
           </div>
 
           <div id="central">
           <script type="text/javascript">
-          geojson3d.plot(document.getElementById("webgl"), '/testbench/central_map.json');
+          geojson3d.plot(document.getElementById("central"), '/testbench/central_map.json');
           </script>
           </div>
 
           <div id="waterloo_topo">
           <script type = "text/javascript">
-          geojson3d.plot(document.getElementById("webgl"), '/testbench/waterloo_map.json');
+          geojson3d.plot(document.getElementById("waterloo_topo"), '/testbench/waterloo_map.json');
           </script>
           </div>
 
           <div id="us-states">
           <script type = "text/javascript">
-          geojson3d.plot(document.getElementById("webgl"), '/testbench/us-states.json');
+          geojson3d.plot(document.getElementById("us-states"), '/testbench/us-states.json');
           </script>
           </div>
 
