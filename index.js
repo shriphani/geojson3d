@@ -218,7 +218,7 @@ function addFeature(sceneObj, feature, projection, functions) {
     return group;
 }
 
-function draw(json_url, container, sceneObj, functions, projectionStr) {
+function draw(json_url, container, sceneObj, projectionStr, functions) {
 
     var width = container.clientWidth;
     var height = container.clientHeight;
@@ -239,7 +239,7 @@ function draw(json_url, container, sceneObj, functions, projectionStr) {
         }
 
         if (data.type === 'FeatureCollection') {
-
+            console.log(projectionStr);
             drawFeatureCollection(data, width, height, functions, sceneObj, projectionStr);
 
         } else if (data.type === 'Topology') {
@@ -272,7 +272,7 @@ function draw(json_url, container, sceneObj, functions, projectionStr) {
     });
 }
 
-function drawFeatureCollection(data, width, height, functions, sceneObj) {
+function drawFeatureCollection(data, width, height, functions, sceneObj, projectionStr) {
     var projection = geo.getProjection(data, width, height, projectionStr);
     data.features.forEach(function(feature) {
         var group = addFeature(sceneObj, feature, projection, functions);
@@ -295,10 +295,10 @@ var initScene = function (container, json_location, width, height) {
     }
 
     if (Number.isInteger(width)) {
-        width = string(width) + "px";
+        width = String(width) + "px";
     }
     if (Number.isInteger(height)) {
-        height = string(height) + "px";
+        height = String(height) + "px";
     }
 
     camera = new THREE.PerspectiveCamera( 70, container.clientWidth / container.clientHeight, 0.1, 10000);
