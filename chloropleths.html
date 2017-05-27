@@ -9,13 +9,6 @@
     <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
   </head>
   <body>
-      
-          <div id="waterloo_geo">
-          <script type="text/javascript">
-          geojson3d.plot(document.getElementById("waterloo_geo"), '/testbench/waterloo_geo.json');
-          </script>
-          </div>
-
           <div id="central">
           <script type="text/javascript">
           geojson3d.plot(document.getElementById("central"), '/testbench/central_map.json');
@@ -30,7 +23,7 @@
 
           <div id="us-states">
           <script type = "text/javascript">
-          geojson3d.plot(document.getElementById("us-states"), '/testbench/us-states.json');
+          geojson3d.plot(document.getElementById("us-states"), '/testbench/us_states.json', 640, 480, 'Albers');
           </script>
           </div>
 
