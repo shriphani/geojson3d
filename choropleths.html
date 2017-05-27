@@ -21,9 +21,16 @@
       </script>
     </div>
 
-    <div id="us-states">
+    <div id="us-counties">
       <script type = "text/javascript">
-        geojson3d.plot(document.getElementById("us-states"), '/testbench/us_counties_20m.json');
+        geojson3d.plot(document.getElementById("us-counties"), '/testbench/us_counties_20m.json');
+      </script>
+    </div>
+
+    <div id="us-states">
+      US States, width, height options
+      <script type = "text/javascript">
+        geojson3d.plot(document.getElementById("us-states"), '/testbench/us_states.json', 640, 480, 'Mercator');
       </script>
     </div>
   </body>
