@@ -30,7 +30,7 @@ var projections = {
    "Larrivée": d3Projections.geoLarrivee().scale(95),
    "Laskowski": d3Projections.geoLaskowski().scale(120),
    "Loximuthal": d3Projections.geoLoximuthal(),
-  //  "Mercator": d3Projections.geo.mercator().scale(490 / 2 / Math.PI),
+   "Mercator": d3.geoMercator(),
    "Miller": d3Projections.geoMiller().scale(100),
    "McBryde–Thomas Flat-Polar Parabolic": d3Projections.geoMtFlatPolarParabolic(),
    "McBryde–Thomas Flat-Polar Quartic": d3Projections.geoMtFlatPolarQuartic(),
