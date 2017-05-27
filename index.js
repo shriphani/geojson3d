@@ -295,10 +295,10 @@ var initScene = function (container, json_location, width, height) {
     }
 
     if (Number.isInteger(width)) {
-        width = String(width) + "px";
+        container.style.width = String(width) + "px";
     }
     if (Number.isInteger(height)) {
-        height = String(height) + "px";
+        container.style.height = String(height) + "px";
     }
 
     camera = new THREE.PerspectiveCamera( 70, container.clientWidth / container.clientHeight, 0.1, 10000);
