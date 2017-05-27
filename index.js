@@ -204,6 +204,7 @@ function addFeature(sceneObj, feature, projection, functions) {
 
     if (feature.geometry.type === 'Polygon') {
         var shape = geo.createPolygonShape(feature.geometry.coordinates, projection);
+        console.log(shape);
         addShape(group, shape, extrudeSettings, material, color, 0, 0, amount, Math.PI, 0, 0, 1);
     } else if (feature.geometry.type === 'MultiPolygon') {
         feature.geometry.coordinates.forEach(function(polygon) {
@@ -242,17 +243,25 @@ function draw(json_url, container, sceneObj, functions, projectionStr) {
             drawFeatureCollection(data, width, height, functions, sceneObj, projectionStr);
 
         } else if (data.type === 'Topology') {
-
+            console.log(data.objects);
             var geojson = topojson.feature(data, data.objects[Object.keys(data.objects)[0]]);
             var projection = geo.getProjection(geojson, width, height, projectionStr);
 
+            
             Object.keys(data.objects).forEach(function(key) {
-                data.objects[key].geometries.forEach(function(object) {
-                    var feature = topojson.feature(data, object);
-                    console.log(feature);
-                    var group = addFeature(sceneObj, feature, projection, functions);
-                    object._group = group;
-                });
+                if (key === 'counties') {
+                
+                    data.objects[key].geometries.slice(3, 4).forEach(function(object) {
+                        console.log(object);
+                        var feature = topojson.feature(data, object);
+                        console.log(feature.type);
+                        console.log(feature);
+                        var group = addFeature(sceneObj, feature, projection, functions);
+                        
+                        object._group = group;
+                    });
+                }
+
             });
 
             } else {
