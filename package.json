@@ -1,6 +1,6 @@
 {
   "name": "geojson3d",
-  "version": "1.0.0",
+  "version": "0.8.0",
   "description": "Renders GeoJsons using Three.js",
   "main": "index.js",
   "scripts": {
