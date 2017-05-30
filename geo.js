@@ -5,7 +5,7 @@ var THREE = require('three');
 
 var projections = {
    "Aitoff": d3Projections.geoAitoff(),
-   "Albers":  d3.geoAlbers().scale(145).parallels([20, 50]),
+   "Albers":  d3.geoAlbers(),
    "August": d3Projections.geoAugust().scale(60),
    "Baker": d3Projections.geoBaker().scale(100),
    "Boggs": d3Projections.geoBoggs(),
@@ -158,6 +158,7 @@ var geo = {
     getProjection: getProjection,
     ringToPoints: ringToPoints,
     createPolygonShape: createPolygonShape,
-    centerProjection: centerProjection
+    centerProjection: centerProjection,
+    projections: projections
 }
 module.exports = geo
