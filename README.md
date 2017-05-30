@@ -12,22 +12,15 @@ OS X setup
    * https://brew.sh/ - Install this
    * https://docs.npmjs.com/getting-started/installing-node
 
-We are using gulp and browserify.
+We are using webpack.
 
 On cloning this project for the first time, do
 
     * `npm install --save`
-    * `npm install --global gulp-cli`
 
 To begin development, do:
 
-    * `gulp dev`
+    * `webpack-dev-server`
 
 This starts a webserver at [http://localhost:8000](http://localhost:8000).
-The module is exposed as `geojson3d` - access it in your browser console.
-Example function call:
-```
-geojson3d.initScene(document.getElementById('webgl'), 'https://raw.githubusercontent.com/scribu/romania-3d/gh-pages/data/romania-topo.json');
-```
-
-This should render romania.
+Visit [http://localhost:8000/choropleths.html](http://localhost:8000) for some example plots.
