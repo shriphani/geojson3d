@@ -25,7 +25,6 @@
   },
   "homepage": "https://github.com/shriphani/geojson3d#readme",
   "dependencies": {
-    "browserify": "^14.4.0",
     "d3": "^4.9.1",
     "d3-geo-projection": "^2.1.0",
     "earcut": "^2.1.1",
