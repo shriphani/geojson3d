@@ -9,24 +9,26 @@
     <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
   </head>
   <body>
+
+    <!-- Plots the map of Central region -->
     <div id="central">
       <script type="text/javascript">
         geojson3d.plot(document.getElementById("central"), '/testbench/central_map.json');
       </script>
     </div>
-
+    <!-- Plots a map of waterloo from TopoJson data -->
     <div id="waterloo_topo">
       <script type = "text/javascript">
         geojson3d.plot(document.getElementById("waterloo_topo"), '/testbench/waterloo_map.json');
       </script>
     </div>
-
+    <!-- Plots a map of the United States Counties-->
     <div id="us-counties">
       <script type = "text/javascript">
         geojson3d.plot(document.getElementById("us-counties"), '/testbench/us_counties_20m.json');
       </script>
     </div>
-
+    <!-- Plots a map of all the states in the  United States of America-->
     <div id="us-states">
       US States, width, height options
       <script type = "text/javascript">

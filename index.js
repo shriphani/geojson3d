@@ -52,6 +52,12 @@ var materials = {
 
 var material = 'phong';
 
+/**
+ * Zooms the map then the browser is resized
+ * @param {*} container 
+ * @param {*} sceneobj 
+ * 
+ */
 function onWindowResize(container, sceneObj) {
     sceneObj.camera.aspect = container.clientWidth / container.clientHeight;
     sceneObj.camera.updateProjectionMatrix();
@@ -218,6 +224,15 @@ function addFeature(sceneObj, feature, projection, functions) {
     return group;
 }
 
+/**
+ * A feature is a unit of a FeatureCollection. Converts
+ * a feature to the appropriate three.js object and adds it to the scene.
+ * @param {*} sceneObj 
+ * @param {*} feature 
+ * @param {*} projection 
+ * @param {*} functions 
+ */
+
 function draw(json_url, container, sceneObj, projectionStr, functions) {
 
     var width = container.clientWidth;
@@ -378,6 +393,15 @@ var initScene = function (container, json_location, width, height) {
 
     return sceneObj
 }
+
+/**
+ * When called by the user, it displays the final map.
+ * @param {*} container 
+ * @param {*} json_location
+ * @param {*} width
+ * @param {*} height
+ * @param {*} projection 
+ */
 
 var plot = function(container, json_location, width, height, projection) {
     var sceneObj = initScene(
