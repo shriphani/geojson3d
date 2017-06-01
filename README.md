@@ -17,10 +17,12 @@ We are using webpack.
 On cloning this project for the first time, do
 
     * `npm install --save`
+    * `sudo npm install -g webpack`
+    * `sudo npm install -g webpack-dev-server`
 
 To begin development, do:
 
-    * `webpack-dev-server`
+    * `webpack-dev-server`    
 
 This starts a webserver at [http://localhost:8000](http://localhost:8000).
 Visit [http://localhost:8000/choropleths.html](http://localhost:8000) for some example plots.

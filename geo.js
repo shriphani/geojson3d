@@ -50,8 +50,13 @@ var projections = {
    "Winkel Tripel": d3Projections.geoWinkel3(),
    "Identity": d3.geoProjection(function(x, y) { return [x, y];}) };
 
+/** 
+* return scaling factor that fit bounds within width/height
+* @param {*} bounds
+* @param {*} width
+* @param {*} height 
+*/
 
-// return scaling factor that fit bounds within width/height
 function fit(bounds, width, height)
 {
   var topLeft = bounds[0];
@@ -69,7 +74,14 @@ function fit(bounds, width, height)
   return scale;
 }
 
-// D3.js projection from GeoJSON bounds
+/**
+* D3.js projection from GeoJSON bounds
+* @param {*} geojson
+* @param {*} width
+* @param {*} height
+* @param {*} projection 
+*/
+
 function getProjection(geojson, width, height, projection) {
   // From:
   //   http://stackoverflow.com/questions/14492284/center-a-map-in-d3-given-a-geojson-object?answertab=active#tab-top
@@ -125,7 +137,11 @@ function centerProjection(geojson, width, height) {
     .translate([0, 0]);
 }
 
-// Use D3.js projection to create array of Three.js points/vectors from GeoJSON ring
+/**
+ *  Use D3.js projection to create array of Three.js points/vectors from GeoJSON ring
+ * @param {*} ring
+ * @param {*} projection 
+*/
 function ringToPoints(ring, projection) {
   return ring.map(function(point) {
     //console.log('Point', point);
@@ -136,7 +152,12 @@ function ringToPoints(ring, projection) {
   });
 }
 
-// Create Three.js polygon from GeoJSON Polygon
+/**
+ *  Create Three.js polygon from GeoJSON Polygon
+ * @param {*} polygon
+ * @param {*} projection
+*/
+
 function createPolygonShape(polygon, projection) {
   var outerRing = polygon[0];
   var points = ringToPoints(outerRing, projection);
