@@ -50,6 +50,16 @@ var materials = {
     }
 };
 
+var randomFunctions = {
+    color: function(d) {
+        return Math.random() * 16777216;
+    },
+
+    height: function(d) {
+        return Math.random() * 20;
+    }
+};
+
 var material = 'phong';
 
 function onWindowResize(container, sceneObj) {
@@ -77,7 +87,6 @@ function clearGroups(json, sceneObj) {
         } else if (json.type === 'Topology') {
             Object.keys(json.objects).forEach(
                 function(key) {
-                    console.log(json.objects[key]);
                     json.objects[key].geometries.forEach(
                         function(object) {
                             sceneObj.scene.remove(object._group);
@@ -176,7 +185,7 @@ function addShape(group, shape, extrudeSettings, material, color, x, y, z, rx, r
  * @param {*} projection 
  * @param {*} functions 
  */
-function addFeature(sceneObj, feature, projection, functions) {
+function addFeature(sceneObj, feature, projection, functions=randomFunctions) {
     var group = new THREE.Group();
     sceneObj.scene.add(group);
 
@@ -204,7 +213,6 @@ function addFeature(sceneObj, feature, projection, functions) {
 
     if (feature.geometry.type === 'Polygon') {
         var shape = geo.createPolygonShape(feature.geometry.coordinates, projection);
-        console.log(shape);
         addShape(group, shape, extrudeSettings, material, color, 0, 0, amount, Math.PI, 0, 0, 1);
     } else if (feature.geometry.type === 'MultiPolygon') {
         feature.geometry.coordinates.forEach(function(polygon) {
@@ -212,13 +220,13 @@ function addFeature(sceneObj, feature, projection, functions) {
         addShape(group, shape, extrudeSettings, material, color, 0, 0, amount, Math.PI, 0, 0, 1);
         });
     } else {
-        console.log('This tutorial only renders Polygons and MultiPolygons')
+        console.err('This tutorial only renders Polygons and MultiPolygons')
     }
 
     return group;
 }
 
-function draw(json_url, container, sceneObj, projectionStr, functions) {
+function draw(json_url, container, sceneObj, projectionStr, functions, preprojected=false) {
 
     var width = container.clientWidth;
     var height = container.clientHeight;
@@ -226,77 +234,63 @@ function draw(json_url, container, sceneObj, projectionStr, functions) {
     d3.json(json_url, function(data) {
         clearGroups(data, sceneObj);
 
-        if (functions == undefined) {
-            functions = {
-                color: function(d) {
-                    return Math.random() * 16777216;
-                },
-
-                height: function(d) {
-                    return Math.random() * 20;
-                }
-            };
-        }
-
         if (data.type === 'FeatureCollection') {
-            console.log(projectionStr);
-            drawFeatureCollection(data, width, height, functions, sceneObj, projectionStr);
-
+            drawFeatureCollection(data, width, height, functions, sceneObj, projectionStr, preprojected);
         } else if (data.type === 'Topology') {
-            console.log(data.objects);
-            var geojson = topojson.feature(data, data.objects[Object.keys(data.objects)[0]]);
-            var projection = geo.getProjection(geojson, width, height, projectionStr);
-
-            
-            Object.keys(data.objects).forEach(function(key) {
-                if (key === 'counties') {
-                
-                    data.objects[key].geometries.slice(3, 4).forEach(function(object) {
-                        console.log(object);
-                        var feature = topojson.feature(data, object);
-                        console.log(feature.type);
-                        console.log(feature);
-                        var group = addFeature(sceneObj, feature, projection, functions);
-                        
-                        object._group = group;
-                    });
-                }
-
-            });
-
-            } else {
-                console.log('This tutorial only renders TopoJSON and GeoJSON FeatureCollections')
-            }
+            drawTopology(data, width, height, functions, sceneObj, projectionStr, preprojected);
+        } else {
+            console.err('Only TopoJSON and GeoJSON FeatureCollections are supported');
+        }
 
         sceneObj.renderer.render(sceneObj.scene, sceneObj.camera);
     });
 }
 
-function drawFeatureCollection(data, width, height, functions, sceneObj, projectionStr) {
-    var projection = geo.getProjection(data, width, height, projectionStr);
+function drawFeatureCollection(data, width, height, functions, sceneObj, projectionStr, preprojected) {
+    var projection = null;
+    if (isFunction(projectionStr)) {
+        projection = projectionStr;
+    } else {
+        if (!preprojected) {
+            projection = geo.getProjection(data, width, height, projectionStr);
+        }
+    }
     data.features.forEach(function(feature) {
         var group = addFeature(sceneObj, feature, projection, functions);
         feature._group = group;
     });
 }
 
-var initScene = function (container, json_location, width, height) {
+function drawTopology(data, width, height, functions, sceneObj, projectionStr, preprojected) {
+    var geojson = topojson.feature(data, data.objects[Object.keys(data.objects)[0]]);
+
+    // if not preprojected, compute a projection
+    var projection = null;
+    if (isFunction(projectionStr)) {
+        projection = projectionStr;
+    } else {
+        if (!preprojected) {
+            projection = geo.getProjection(geojson, width, height, projectionStr);
+        }
+    }
+
+    Object.keys(data.objects).forEach(function(key) {
+        console.log(data.objects[key]);
+        data.objects[key].geometries.forEach(function(object) {
+            var feature = topojson.feature(data, object);
+            var group = addFeature(sceneObj, feature, projection, functions);
+            object._group = group;
+        });
+    });
+}
+
+var initScene = function (container, json_location, width=640, height=480) {
 
     var camera, controls, scene, renderer;
     var light, spotLight, ambientLight;
     var cross;
 
-    if (width == undefined) {
-        container.style.width = defaultWidth + "px";
-    }
-
-    if (height == undefined) {
-        container.style.height = defaultHeight + "px";
-    }
-
-    if (Number.isInteger(width)) {
-        container.style.width = String(width) + "px";
-    }
+    container.style.width = String(width) + "px";
     if (Number.isInteger(height)) {
         container.style.height = String(height) + "px";
     }
@@ -379,7 +373,12 @@ var initScene = function (container, json_location, width, height) {
     return sceneObj
 }
 
-var plot = function(container, json_location, width, height, projection) {
+var isFunction = function(functionToCheck) {
+    var getType = {};
+    return functionToCheck && getType.toString.call(functionToCheck) === '[object Function]';
+}
+
+var plot = function(container, json_location, width, height, projection=undefined, functions=randomFunctions, preprojected=false) {
     var sceneObj = initScene(
         container,
         json_location,
@@ -387,8 +386,10 @@ var plot = function(container, json_location, width, height, projection) {
         height
     );
 
-    draw(json_location, container, sceneObj, projection);
+    draw(json_location, container, sceneObj, projection, functions, preprojected);
     animate(sceneObj);
 }
 
 exports.plot = plot;
+exports.projections = geo.projections;
+exports.randomFunctions = randomFunctions;
