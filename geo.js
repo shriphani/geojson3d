@@ -6,11 +6,13 @@ var THREE = require('three');
 var projections = {
    "Aitoff": d3Projections.geoAitoff(),
    "Albers":  d3.geoAlbers(),
+   "Albers-USA": d3.geoConicEqualArea().parallels([29.5, 45.5]).rotate([98, 0]).center([0, 38]),
    "August": d3Projections.geoAugust().scale(60),
    "Baker": d3Projections.geoBaker().scale(100),
    "Boggs": d3Projections.geoBoggs(),
    "Bonne": d3Projections.geoBonne().scale(120),
    "Bromley": d3Projections.geoBromley(),
+   "Conic": d3.geoConicEqualArea(),
    "Collignon": d3Projections.geoCollignon().scale(93),
    "Craster Parabolic": d3Projections.geoCraster(),
    "Eckert I": d3Projections.geoEckert1().scale(165),
@@ -82,12 +84,11 @@ function getProjection(geojson, width, height, projection) {
   }
 
   var center = turf.centroid(geojson).geometry.coordinates;
-  console.log(center);
 
   var the_projection = projections[projection]
         .center(center)
         .scale(1)
-        .translate([0, 0]);
+        .translate(center);
 
   // Create the path
   var path = d3.geoPath().projection(the_projection);
@@ -100,39 +101,28 @@ function getProjection(geojson, width, height, projection) {
 
   var scale = fit(bounds, width, height);
 
-  // New projection
-  the_projection = projections[projection]
-    .center(center)
-    .scale(scale)
-    .translate([0,0]);
-
+  if (projection == "Albers-USA" || projection == "Albers") {
+    the_projection = projections[projection]
+      .center(center)
+      .scale(scale)
+      .translate([-width/2, -height/2]);
+  } else {
+    the_projection = projections[projection]
+      .center(center)
+      .scale(scale)
+      .translate([0, 0]);
+  }
   return the_projection;
-}
-
-function centerProjection(geojson, width, height) {
-  var center = turf.centroid(geojson).geometry.coordinates;
-  console.log(center);
-  var path   = d3.geoPath().projection(null);
-  var bounds = path.bounds(geojson);
-  console.log(bounds);
-  var scale = fit(bounds, width, height);
-  console.log(scale);
-
-  return d3.geoProjection(function(x, y) { return [x, y];})
-    //.center(center)
-    .precision(0)
-    .scale(1)
-    .translate([0, 0]);
 }
 
 // Use D3.js projection to create array of Three.js points/vectors from GeoJSON ring
 function ringToPoints(ring, projection) {
   return ring.map(function(point) {
-    //console.log('Point', point);
-    var projected = projection(point);
-    //console.log('Point projected', projected);
-    //console.log(projection)
-    return new THREE.Vector2(projected[0], projected[1]);
+    if (projection != null) {
+      var projected = projection(point);
+      return new THREE.Vector2(projected[0], projected[1]);
+    }
+    return new THREE.Vector2(point[0], point[1]);
   });
 }
 
@@ -158,7 +148,6 @@ var geo = {
     getProjection: getProjection,
     ringToPoints: ringToPoints,
     createPolygonShape: createPolygonShape,
-    centerProjection: centerProjection,
     projections: projections
 }
 module.exports = geo

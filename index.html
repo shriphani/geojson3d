@@ -2,7 +2,7 @@
   <head>
    <meta charset="utf-8">
     <title>
-      Chloropleth maps
+      Testbench Maps
     </title>
     <script type="text/javascript" src="bundle.js">
     </script>
@@ -11,7 +11,7 @@
   <body>
     <div id="central">
       <script type="text/javascript">
-        geojson3d.plot(document.getElementById("central"), '/testbench/central_map.json');
+        geojson3d.plot(document.getElementById("central"), '/testbench/central_map.json', 640, 480, "Mercator");
       </script>
     </div>
 
@@ -23,14 +23,28 @@
 
     <div id="us-counties">
       <script type = "text/javascript">
-        geojson3d.plot(document.getElementById("us-counties"), '/testbench/us_counties_20m.json');
+        geojson3d.plot(document.getElementById("us-counties"), '/testbench/us_counties_20m.json', 640, 480, "Albers-USA");
       </script>
     </div>
 
     <div id="us-states">
       US States, width, height options
       <script type = "text/javascript">
-        geojson3d.plot(document.getElementById("us-states"), '/testbench/us_states.json', 640, 480, 'Mercator');
+        geojson3d.plot(document.getElementById("us-states"), '/testbench/us_states.json', 640, 480, "Albers");
+      </script>
+    </div>
+
+    <div id="us-states-2">
+      US States, width, height options
+      <script type = "text/javascript">
+        geojson3d.plot(document.getElementById("us-states-2"), '/testbench/us_states.json', 640, 480, "Mercator");
+      </script>
+    </div>
+
+    <div id="preprojected">
+      US Counties preprojected
+      <script type="text/javascript">
+        geojson3d.plot(document.getElementById("preprojected"), '/testbench/us-10m.v1.json', 960, 600, null, geojson3d.randomFunctions, true);
       </script>
     </div>
   </body>
