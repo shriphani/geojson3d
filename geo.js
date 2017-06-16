@@ -76,10 +76,10 @@ function fit(bounds, width, height)
 
 /**
 * D3.js projection from GeoJSON bounds
-* @param {*} geojson
+* @param {*} geojson * the geojson data for the region to be plotted
 * @param {*} width
 * @param {*} height
-* @param {*} projection 
+* @param {*} projection * the type of projection the user needs
 */
 
 function getProjection(geojson, width, height, projection) {
@@ -140,7 +140,7 @@ function centerProjection(geojson, width, height) {
 /**
  *  Use D3.js projection to create array of Three.js points/vectors from GeoJSON ring
  * @param {*} ring
- * @param {*} projection 
+ * @param {*} projection  * type of projection the user needs. ex 'Mercator'
 */
 function ringToPoints(ring, projection) {
   return ring.map(function(point) {
@@ -155,7 +155,7 @@ function ringToPoints(ring, projection) {
 /**
  *  Create Three.js polygon from GeoJSON Polygon
  * @param {*} polygon
- * @param {*} projection
+ * @param {*} projection * type of projection the user needs. ex 'Mercator'
 */
 
 function createPolygonShape(polygon, projection) {

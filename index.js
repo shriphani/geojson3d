@@ -54,8 +54,8 @@ var material = 'phong';
 
 /**
  * Zooms the map then the browser is resized
- * @param {*} container 
- * @param {*} sceneobj 
+ * @param {*} container * the HTML element where the map is drawn
+ * @param {*} sceneobj * openGL scene objects
  * 
  */
 function onWindowResize(container, sceneObj) {
@@ -177,9 +177,9 @@ function addShape(group, shape, extrudeSettings, material, color, x, y, z, rx, r
 /**
  * A feature is a unit of a FeatureCollection. Converts
  * a feature to the appropriate three.js object and adds it to the scene.
- * @param {*} sceneObj 
+ * @param {*} sceneObj * OpenGL scene object
  * @param {*} feature 
- * @param {*} projection 
+ * @param {*} projection *  type of projection the user needs. ex 'Mercator'
  * @param {*} functions 
  */
 function addFeature(sceneObj, feature, projection, functions) {
@@ -224,14 +224,6 @@ function addFeature(sceneObj, feature, projection, functions) {
     return group;
 }
 
-/**
- * A feature is a unit of a FeatureCollection. Converts
- * a feature to the appropriate three.js object and adds it to the scene.
- * @param {*} sceneObj 
- * @param {*} feature 
- * @param {*} projection 
- * @param {*} functions 
- */
 
 function draw(json_url, container, sceneObj, projectionStr, functions) {
 
@@ -396,11 +388,11 @@ var initScene = function (container, json_location, width, height) {
 
 /**
  * When called by the user, it displays the final map.
- * @param {*} container 
- * @param {*} json_location
- * @param {*} width
- * @param {*} height
- * @param {*} projection 
+ * @param {*} container * the html element where the map is drawn
+ * @param {*} json_location * the address of the json file, a URL or a local path.
+ * @param {*} width * width of the map
+ * @param {*} height * height of the map
+ * @param {*} projection * type of projection the user needs. ex 'Mercator'
  */
 
 var plot = function(container, json_location, width, height, projection) {

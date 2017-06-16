@@ -10,30 +10,67 @@
   </head>
   <body>
 
-    <!-- Plots the map of Central region -->
+    <div>  Central Ontario map </div>
+    
     <div id="central">
       <script type="text/javascript">
         geojson3d.plot(document.getElementById("central"), '/testbench/central_map.json');
       </script>
     </div>
-    <!-- Plots a map of waterloo from TopoJson data -->
+    <div> Waterloo Topojson map </div>
     <div id="waterloo_topo">
       <script type = "text/javascript">
         geojson3d.plot(document.getElementById("waterloo_topo"), '/testbench/waterloo_map.json');
       </script>
     </div>
-    <!-- Plots a map of the United States Counties-->
+    <div> United States Counties </div>
     <div id="us-counties">
       <script type = "text/javascript">
         geojson3d.plot(document.getElementById("us-counties"), '/testbench/us_counties_20m.json');
       </script>
     </div>
-    <!-- Plots a map of all the states in the  United States of America-->
+    <div> USA political map </div>
     <div id="us-states">
-      US States, width, height options
+      <!-- US States, width, height options -->
       <script type = "text/javascript">
         geojson3d.plot(document.getElementById("us-states"), '/testbench/us_states.json', 640, 480, 'Mercator');
       </script>
     </div>
+
+    <div> A map of Asia </div>
+    <div id="asia">
+      <script type="text/javascript">
+        geojson3d.plot(document.getElementById("asia"), '/testbench/asia.json');
+      </script>
+    </div>
+
+    <div> A map of Oceania </div>
+    <div id="oceania">
+      <script type="text/javascript">
+        geojson3d.plot(document.getElementById("oceania"), '/testbench/oceania.json');
+      </script>
+    </div>
+
+    <div> A map of Europe </div>
+    <div id="EU">
+      <script type="text/javascript">
+        geojson3d.plot(document.getElementById("EU"), '/testbench/EU.json');
+      </script>
+    </div>
+    
+    <div> A map of Africa </div>
+       <div id="africa">
+      <script type="text/javascript">
+        geojson3d.plot(document.getElementById("africa"), '/testbench/africa.json');
+      </script>
+    </div>
+
+    <div> A map of the whole world </div>
+       <div id="world">
+      <script type="text/javascript">
+        geojson3d.plot(document.getElementById("world"), '/testbench/world.json');
+      </script>
+    </div>
+
   </body>
 </html>
